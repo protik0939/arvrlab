@@ -46,7 +46,7 @@ export default function RootLayout({
         <Navbar />
         <BackgroundShade />
         {children}
-        <MyFooter/>
+        <MyFooter />
       </body>
     </html>
   );
