@@ -9,7 +9,7 @@ export default function Contacts() {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
-      className="min-h-screen flex flex-col justify-center items-center text-white p-6 pt-32"
+      className="min-h-screen flex flex-col justify-center items-center text-white p-6 pt-32 overflow-hidden"
     >
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
