@@ -18,13 +18,13 @@ const VrHeadset = () => {
 
   useEffect(() => {
     if (!containerRef.current) return;
-
+  
     const container = containerRef.current;
-
+  
     // Scene Setup
     const scene = new THREE.Scene();
     sceneRef.current = scene;
-
+  
     // Camera Setup
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -34,27 +34,27 @@ const VrHeadset = () => {
     );
     camera.position.set(0, 1, 5);
     cameraRef.current = camera;
-
+  
     // Renderer Setup
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000, 0); // Removed background
+    renderer.setClearColor(0x000000, 0); // Transparent background
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
-
+  
     // Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 1);
     scene.add(ambientLight);
-
+  
     const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
     directionalLight.position.set(5, 5, 5);
     scene.add(directionalLight);
-
+  
     // OrbitControls Setup
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controlsRef.current = controls;
-
+  
     // Load 3D Model
     const loader = new GLTFLoader();
     loader.load(
@@ -64,60 +64,70 @@ const VrHeadset = () => {
           scene.remove(modelRef.current);
         }
         modelRef.current = gltf.scene;
-
-        // **Make the object bigger**
-        modelRef.current.scale.set(.8, .8, .8);
-
-        // **Move it slightly to the right**
-        modelRef.current.position.set(3, -.5, 0);
-
+  
+        // **Set the model's scale**
+        modelRef.current.scale.set(0.8, 0.8, 0.8);
+  
+        // **Initial Position Based on Screen Width**
+        const setModelPosition = () => {
+          if (!modelRef.current) return;
+          const screenWidth = window.innerWidth;
+  
+          if (screenWidth > 1200) {
+            modelRef.current.position.set(3, -0.5, 0); // Desktop
+          } else if (screenWidth > 768) {
+            modelRef.current.position.set(2, -0.5, 0); // Tablet
+          } else {
+            modelRef.current.position.set(0, -0.5, 0); // Mobile (centered)
+          }
+        };
+  
+        setModelPosition();
+        window.addEventListener("resize", setModelPosition);
+  
         scene.add(modelRef.current);
       },
       undefined,
       (error) => console.error("Error loading model:", error)
     );
-
+  
     // Mouse Move Interaction
     const handleMouseMove = (event: MouseEvent) => {
       if (!modelRef.current) return;
-
-      // Normalize mouse position to range [-1, 1]
+  
       const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
       const mouseY = (event.clientY / window.innerHeight) * 2 - 1;
-
-      // Set target rotation based on mouse movement
+  
       targetRotation.current.x = -mouseY * 0.3; // Up-down tilt
-      targetRotation.current.y = mouseX * 0.5;  // Left-right rotation
+      targetRotation.current.y = mouseX * 0.5; // Left-right rotation
     };
     window.addEventListener("mousemove", handleMouseMove);
-
+  
     // Animation Loop (with Smooth Lerp)
     const animate = () => {
       animationFrameIdRef.current = requestAnimationFrame(animate);
-      
-      // Smoothly interpolate the rotations towards the target values
+  
       if (modelRef.current) {
         currentRotation.current.x = THREE.MathUtils.lerp(
           currentRotation.current.x,
           targetRotation.current.x,
-          0.1 // Smoothness factor (lower = smoother, higher = snappier)
+          0.1
         );
         currentRotation.current.y = THREE.MathUtils.lerp(
           currentRotation.current.y,
           targetRotation.current.y,
           0.1
         );
-
-        // Apply the smooth rotations to the model
+  
         modelRef.current.rotation.x = currentRotation.current.x;
         modelRef.current.rotation.y = currentRotation.current.y;
       }
-
+  
       controls.update();
       renderer.render(scene, camera);
     };
     animate();
-
+  
     // Handle Window Resize
     const handleResize = () => {
       if (!cameraRef.current || !rendererRef.current) return;
@@ -126,7 +136,7 @@ const VrHeadset = () => {
       rendererRef.current.setSize(window.innerWidth, window.innerHeight);
     };
     window.addEventListener("resize", handleResize);
-
+  
     // Cleanup on Unmount
     return () => {
       if (animationFrameIdRef.current) cancelAnimationFrame(animationFrameIdRef.current);
@@ -138,6 +148,7 @@ const VrHeadset = () => {
       }
     };
   }, []);
+  
 
   return <div ref={containerRef} style={{ width: "100vw", height: "100vh" }} />;
 };

@@ -3,9 +3,9 @@ import Home from "./(components)/Home";
 
 export default function HomeFunc() {
   return (
-    <div className="">
-      <Feed/>
-      <Home/>
+    <div className="overflow-hidden">
+      <Feed />
+      <Home />
     </div>
   );
 }

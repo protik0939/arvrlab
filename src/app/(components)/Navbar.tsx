@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useState, useEffect, useRef } from 'react';
 import arvrLogo from '../../../public/arvrlablogo.svg';
-import { IoArrowBackCircleOutline } from "react-icons/io5";
+import { BiSolidChevronUpSquare } from "react-icons/bi";
 
 export default function Navbar() {
     const pathname = usePathname();
@@ -41,11 +41,36 @@ export default function Navbar() {
 
     return (
         <>
-            <Link className='fixed top-2 left-2 z-50' href={'/'}>
-                <Image src={arvrLogo} alt='Arvr DIU' height={100} width={100} className='w-20 rounded-3xl' />
-            </Link>
-            <div ref={sidebarRef} className={`fixed z-50 top-0 p-2 px-5 flex flex-col justify-center h-screen ${toggle ? 'left-0' : '-left-80'} transition-all ease-in-out`}>
-                <ol className="flex flex-col space-y-4 text-2xl bg-black/25 p-10 rounded-2xl border-2 border-amber-200 backdrop-blur-lg">
+            <div className='fixed z-50 px-4 flex w-full justify-between items-center'>
+                <Link className='z-50' href={'/'}>
+                    <Image src={arvrLogo} alt='Arvr DIU' height={100} width={100} className='w-20 rounded-3xl' />
+                </Link>
+
+                <div className={`z-50 top-0 p-2 flex flex-col items-end transition-all lg:w-[70%]  ease-in-out`}>
+                    <ol className="flex justify-between lg:space-x-4 text-xl lg:bg-black/25 lg:w-[650px] p-5 px-8w-auto rounded-2xl lg:border-2 lg:border-amber-200 lg:backdrop-blur-lg">
+                        {navLinks.map((n) => {
+                            const isActive = pathname === n.path;
+                            return (
+                                <Link key={n.title} href={n.path} className='hidden lg:block'>
+                                    <button>
+                                        <li className={`hover:border-y-2 group transition-all ease-in-out ${isActive ? 'border-y-2 border-amber-200 font-bold' : ''}`}>
+                                            <h1 className={` ${isActive ? 'text-amber-200' : ''}`}>
+                                                {n.title}
+                                            </h1>
+                                        </li>
+                                    </button>
+                                </Link>
+                            );
+                        })}
+                        <button className='group lg:hidden block w-full justify-center items-center' onClick={closeSideBar}>
+                            <BiSolidChevronUpSquare className={`text-5xl transition-transform duration-300 group-hover:text-amber-200 group-hover:scale-105 ${toggle ? 'rotate-0' : 'rotate-180'}`} />
+                        </button>
+                    </ol>
+                </div>
+            </div>
+
+            <div ref={sidebarRef} className={`z-50 p-2 px-5 flex flex-col`}>
+                <ol className={`flex z-50 flex-col fixed right-5 transition-all ease-in-out space-y-4 ${toggle ? 'top-[90px]' : '-top-96'} text-2xl bg-black/25 p-10 rounded-2xl border-2 border-amber-200 backdrop-blur-lg`}>
                     {navLinks.map((n) => {
                         const isActive = pathname === n.path;
                         return (
@@ -62,9 +87,6 @@ export default function Navbar() {
                     })}
                 </ol>
             </div>
-            <button className='fixed left-2 bottom-2 z-50 group' onClick={closeSideBar}>
-                <IoArrowBackCircleOutline className={`text-5xl transition-transform duration-300 group-hover:text-amber-200 group-hover:scale-105 ${toggle ? 'rotate-0' : 'rotate-180'}`} />
-            </button>
         </>
     );
 }
